@@ -1,3 +1,2 @@
-#!/usr/bin/env node
-
-console.log('hello world')
+const cityName = process.argv[2]
+console.log(cityName)
