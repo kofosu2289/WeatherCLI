@@ -10,15 +10,15 @@ const tempUnit =
     ? "°C"
     : tempUnitFlag === "-k"
     ? "K"
-    : "";
+    : tempUnitFlag;
 const unitGroup =
   tempUnitFlag === "-f"
-    ? "en"
+    ? "us"
     : tempUnitFlag === "-c"
     ? "metric"
     : tempUnitFlag === "-k"
     ? "base"
-    : "";
+    : tempUnitFlag;
 const currentDateTime = `${new Date().toLocaleString()}`;
 
 https
