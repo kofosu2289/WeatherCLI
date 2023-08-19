@@ -4,8 +4,5 @@ node_modules/
 # Environment variables file
 .env
 
-# Output of 'npm pack'
-*.tgz
-
 # Weather data history
 weather.txt
