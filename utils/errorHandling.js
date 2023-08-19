@@ -1,9 +1,9 @@
-class NewError extends Error {
+class MyError extends Error {
   constructor(name, message) {
-    super("");
+    super();
     this.name = name;
     this.stack = message;
   }
 }
 
-module.exports = NewError;
+module.exports = MyError;
