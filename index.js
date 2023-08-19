@@ -2,8 +2,6 @@ require('dotenv').config()
 const https = require('https')
 
 const cityName = process.argv[2]
-console.log(cityName)
-console.log(process.env.API_KEY)
 
 https.get(`${process.env.BASE_URL}${cityName}?key=${process.env.API_KEY}`, (response) => {
     let data = ''
@@ -12,9 +10,11 @@ https.get(`${process.env.BASE_URL}${cityName}?key=${process.env.API_KEY}`, (resp
         data += chunk
     })
 
-    response.on('end', () => {
-        console.log(JSON.parse(data))
+    response.on('end', async () => {
+        const weatherData =await JSON.parse(data);
+        const { currentConditions , resolvedAddress, description} = weatherData
+        console.log(`Current temperature in ${resolvedAddress} is ${currentConditions.temp}F.\nConditions are currently: ${currentConditions.conditions}.\nWhat you should expect: ${description}`)
     })   
 }).on('error', (err) => {
-    console.log(err)
+    console.log({err})
 })
