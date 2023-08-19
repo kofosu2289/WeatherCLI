@@ -4,27 +4,20 @@ const fs = require("fs");
 const { checkForErrors } = require("./utils/errorHandling");
 
 const [cityName, tempUnitFlag] = [process.argv[2], process.argv[3]];
-const tempUnit =
+const tempSettings =
   tempUnitFlag === "-f"
-    ? "°F"
+    ? { tempUnit: "°F", tempUnitGroup: "us" }
     : tempUnitFlag === "-c"
-    ? "°C"
+    ? { tempUnit: "°C", tempUnitGroup: "metric" }
     : tempUnitFlag === "-k"
-    ? "K"
-    : tempUnitFlag;
-const unitGroup =
-  tempUnitFlag === "-f"
-    ? "us"
-    : tempUnitFlag === "-c"
-    ? "metric"
-    : tempUnitFlag === "-k"
-    ? "base"
-    : tempUnitFlag;
+    ? { tempUnit: "K", tempUnitGroup: "base" }
+    : { tempUnit: tempUnitFlag, tempUnitGroup: tempUnitFlag };
+
 const currentDateTime = `${new Date().toLocaleString()}`;
 
 https
   .get(
-    `${process.env.BASE_URL}${cityName}?unitGroup=${unitGroup}&key=${process.env.API_KEY}`,
+    `${process.env.BASE_URL}${cityName}?unitGroup=${tempSettings.tempUnitGroup}&key=${process.env.API_KEY}`,
     (response) => {
       let data = "";
 
@@ -36,7 +29,7 @@ https
       response.on("end", async () => {
         const weatherData = await JSON.parse(data);
         const { currentConditions, resolvedAddress, description } = weatherData;
-        const cliDisplay = `Current temperature in ${resolvedAddress} is ${currentConditions.temp}${tempUnit}.\nConditions are currently: ${currentConditions.conditions}.\nWhat you should expect: ${description}`;
+        const cliDisplay = `Current temperature in ${resolvedAddress} is ${currentConditions.temp}${tempSettings.tempUnit}.\nConditions are currently: ${currentConditions.conditions}.\nWhat you should expect: ${description}`;
         let fileStatus;
 
         fs.access("./weather.txt", fs.F_OK, (err) => {
