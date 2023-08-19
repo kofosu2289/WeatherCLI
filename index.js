@@ -1,67 +1,16 @@
 require("dotenv").config();
-const https = require("https");
-const fs = require("fs");
-const { checkForErrors } = require("./utils/errorHandling");
+const weatherAPI = require("./utils/api");
 
 const [cityName, tempUnitFlag] = [process.argv[2], process.argv[3]];
 const tempSettings =
-  tempUnitFlag === "-f"
+  tempUnitFlag === "-f" || tempUnitFlag === "-fahrenheit"
     ? { tempUnit: "°F", tempUnitGroup: "us" }
-    : tempUnitFlag === "-c"
+    : tempUnitFlag === "-c" || tempUnitFlag === "-celsius"
     ? { tempUnit: "°C", tempUnitGroup: "metric" }
-    : tempUnitFlag === "-k"
+    : tempUnitFlag === "-k" || tempUnitFlag === "-kelvin"
     ? { tempUnit: "K", tempUnitGroup: "base" }
     : { tempUnit: tempUnitFlag, tempUnitGroup: tempUnitFlag };
 
 const currentDateTime = `${new Date().toLocaleString()}`;
 
-https
-  .get(
-    `${process.env.BASE_URL}${cityName}?unitGroup=${tempSettings.tempUnitGroup}&key=${process.env.API_KEY}`,
-    (response) => {
-      let data = "";
-
-      checkForErrors(response.statusCode);
-      response.on("data", (chunk) => {
-        data += chunk;
-      });
-
-      response.on("end", async () => {
-        const weatherData = await JSON.parse(data);
-        const { currentConditions, resolvedAddress, description } = weatherData;
-        const cliDisplay = `Current temperature in ${resolvedAddress} is ${currentConditions.temp}${tempSettings.tempUnit}.\nConditions are currently: ${currentConditions.conditions}.\nWhat you should expect: ${description}`;
-        let fileStatus;
-
-        fs.access("./weather.txt", fs.F_OK, (err) => {
-          if (err) {
-            fileStatus = "empty";
-          } else {
-            fileStatus = "exists";
-          }
-
-          const fileDataPrefix =
-            fileStatus === "empty"
-              ? `${currentDateTime}\n\n`
-              : `\n\n${currentDateTime}`;
-
-          fs.appendFile(
-            "./weather.txt",
-            fileDataPrefix + "\n" + cliDisplay,
-            (err) => {
-              if (err) {
-                console.log(err);
-              } else {
-                console.log(cliDisplay + "\n");
-                console.log(
-                  "Weather was added to your weather tracking file, weather.txt"
-                );
-              }
-            }
-          );
-        });
-      });
-    }
-  )
-  .on("error", (err) => {
-    console.log({ err });
-  });
+weatherAPI(cityName, tempSettings, currentDateTime);
