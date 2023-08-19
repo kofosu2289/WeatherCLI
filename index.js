@@ -3,12 +3,27 @@ const https = require("https");
 const fs = require("fs");
 
 const [cityName, tempUnitFlag] = [process.argv[2], process.argv[3]];
-const tempUnit = tempUnitFlag === "-f" ? "F" : "C";
+const tempUnit =
+  tempUnitFlag === "-f"
+    ? "°F"
+    : tempUnitFlag === "-c"
+    ? "°C"
+    : tempUnitFlag === "-k"
+    ? "K"
+    : "";
+const unitGroup =
+  tempUnitFlag === "-f"
+    ? "en"
+    : tempUnitFlag === "-c"
+    ? "metric"
+    : tempUnitFlag === "-k"
+    ? "base"
+    : "";
 const currentDateTime = `${new Date().toLocaleString()}`;
 
 https
   .get(
-    `${process.env.BASE_URL}${cityName}?key=${process.env.API_KEY}`,
+    `${process.env.BASE_URL}${cityName}?unitGroup=${unitGroup}&key=${process.env.API_KEY}`,
     (response) => {
       let data = "";
 
